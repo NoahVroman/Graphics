@@ -38,7 +38,9 @@ namespace dae
 				if (t > ray.min && t < ray.max)
 				{
 					hitRecord.didHit = true;
-					hitRecord.materialIndex = sphere.materialIndex; 
+					hitRecord.origin = ray.origin + ray.direction * t;
+					hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
+					hitRecord.materialIndex = sphere.materialIndex;
 					hitRecord.t = t;
 					return true;
 				}
@@ -61,6 +63,8 @@ namespace dae
 			{
 				hitRecord.materialIndex = plane.materialIndex;
 				hitRecord.t = t;
+				hitRecord.origin = ray.origin + ray.direction * t;
+				hitRecord.normal = plane.normal;
 				hitRecord.didHit = true;
 				return true;
 			}
