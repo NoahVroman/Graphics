@@ -46,7 +46,10 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection.z = 1;
 			rayDirection.Normalize();
 
-			Ray viewRay{{0,0,0},rayDirection };
+			rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
+
+
+			Ray viewRay{camera.origin,rayDirection };
 			ColorRGB finalColor{ };
 			HitRecord closestHit{};
 

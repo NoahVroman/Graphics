@@ -55,8 +55,34 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
-			//todo: W2
-			//assert(false && "Not Implemented Yet");
+			constexpr float speed{ 10.0f };
+
+			if (pKeyboardState[SDL_SCANCODE_W])
+			{
+				
+				CalculateCameraToWorld();
+				origin.z +=  speed * pTimer->GetElapsed();
+			}
+			if (pKeyboardState[SDL_SCANCODE_S])
+			{
+				CalculateCameraToWorld();
+
+				origin.z -= speed * pTimer->GetElapsed();
+			}
+			if (pKeyboardState[SDL_SCANCODE_D])
+			{
+				CalculateCameraToWorld();
+
+				origin.x += speed * pTimer->GetElapsed();
+			}
+			if (pKeyboardState[SDL_SCANCODE_A])
+			{
+				CalculateCameraToWorld();
+
+				origin.x -= speed * pTimer->GetElapsed();
+			}
+
+
 		}
 	};
 }
