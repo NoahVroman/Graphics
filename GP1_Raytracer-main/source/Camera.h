@@ -12,15 +12,26 @@ namespace dae
 	{
 		Camera() = default;
 
-		Camera(const Vector3& _origin, float _fovAngle):
-			origin{_origin},
-			fovAngle{_fovAngle}
+		Camera(const Vector3& _origin, float _fovAngle) :
+			origin{ _origin },
+			fovAngle{ _fovAngle }
 		{
+			SetFOV(fovAngle);
 		}
 
 
 		Vector3 origin{};
-		float fovAngle{90.f};
+		float fovAngle{ 90.f };
+		float halfFovTan{ 0.0f };
+
+
+		void SetFOV(float newfov) 
+		{
+			fovAngle = newfov;
+			halfFovTan = tanf(fovAngle * 0.5f);
+
+		}
+
 
 		Vector3 forward{Vector3::UnitZ};
 		Vector3 up{Vector3::UnitY};
@@ -55,31 +66,32 @@ namespace dae
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
+			int8_t xDirection = pKeyboardState[SDL_SCANCODE_D] - pKeyboardState[SDL_SCANCODE_A];
+			int8_t zDirection = pKeyboardState[SDL_SCANCODE_W] - pKeyboardState[SDL_SCANCODE_S];
+
+
 			constexpr float speed{ 10.0f };
+			constexpr float rotationSpeed{ 0.1f };
 
-			if (pKeyboardState[SDL_SCANCODE_W])
+			Vector3 localForward = cameraToWorld.TransformVector(forward);
+			localForward.Normalize();
+
+			Vector3 localRight = Vector3::Cross(up, localForward);
+
+			origin += localForward * zDirection;
+			origin += localRight * xDirection;
+
+			if (SDL_BUTTON(mouseState) == SDL_BUTTON_LEFT)
 			{
-				
-				CalculateCameraToWorld();
-				origin.z +=  speed * pTimer->GetElapsed();
+				totalPitch += mouseY * rotationSpeed * pTimer->GetElapsed();				
+				totalYaw += mouseX * rotationSpeed * pTimer->GetElapsed();
+
 			}
-			if (pKeyboardState[SDL_SCANCODE_S])
+
+
+			if (xDirection != 0 || zDirection != 0 || (SDL_BUTTON(mouseState) == SDL_BUTTON_LEFT && (mouseX > 0.f || mouseY > 0.0f)))
 			{
 				CalculateCameraToWorld();
-
-				origin.z -= speed * pTimer->GetElapsed();
-			}
-			if (pKeyboardState[SDL_SCANCODE_D])
-			{
-				CalculateCameraToWorld();
-
-				origin.x += speed * pTimer->GetElapsed();
-			}
-			if (pKeyboardState[SDL_SCANCODE_A])
-			{
-				CalculateCameraToWorld();
-
-				origin.x -= speed * pTimer->GetElapsed();
 			}
 
 

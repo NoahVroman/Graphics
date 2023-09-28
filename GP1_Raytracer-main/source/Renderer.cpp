@@ -41,8 +41,8 @@ void Renderer::Render(Scene* pScene) const
 			float pyc = py + 0.5f;
 
 			Vector3 rayDirection;
-			rayDirection.y = (1.f - ((2.f * pyc) / m_Height));
-			rayDirection.x = ((((2.f * pxc) / m_Width) - 1.f) * ar);
+			rayDirection.x = ((((2.f * pxc) / m_Width) - 1.f) * ar * camera.halfFovTan);
+			rayDirection.y = (1.f - ((2.f * pyc) / m_Height))* camera.halfFovTan;
 			rayDirection.z = 1;
 			rayDirection.Normalize();
 

@@ -156,7 +156,7 @@ namespace dae {
 	void Scene_W2::Initialize()
 	{
 		m_Camera.origin = { 0.f, 3.f, -9.f };
-		m_Camera.fovAngle = 45.f;
+		m_Camera.SetFOV(45.f);
 
 		constexpr unsigned char matId_Solid_Red = 0;
 
