@@ -33,7 +33,6 @@ namespace dae {
 			HitRecord tempHit;
 			if (GeometryUtils::HitTest_Sphere(sphere, ray, tempHit))
 			{
-				// Als deze bol geraakt is en hij is dichterbij dan de vorige treffer, werk closestHit bij
 				if (tempHit.t < closestHit.t)
 				{
 					closestHit = tempHit;
@@ -45,7 +44,6 @@ namespace dae {
 			HitRecord tempHit;
 			if (GeometryUtils::HitTest_Plane(plane, ray, tempHit))
 			{
-				// Als deze bol geraakt is en hij is dichterbij dan de vorige treffer, werk closestHit bij
 				if (tempHit.t < closestHit.t)
 				{
 					closestHit = tempHit;
