@@ -87,8 +87,6 @@ namespace dae
 				totalYaw += mouseX * rotationSpeed * pTimer->GetElapsed();
 
 			}
-
-
 			if (xDirection != 0 || zDirection != 0 || (SDL_BUTTON(mouseState) == SDL_BUTTON_LEFT && (mouseX != 0.f || mouseY != 0.0f)))
 			{
 				CalculateCameraToWorld();

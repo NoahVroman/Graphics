@@ -28,9 +28,9 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
+		HitRecord tempHit;
 		for (const Sphere& sphere : m_SphereGeometries)
 		{
-			HitRecord tempHit;
 			if (GeometryUtils::HitTest_Sphere(sphere, ray, tempHit))
 			{
 				if (tempHit.t < closestHit.t)
@@ -41,7 +41,6 @@ namespace dae {
 		}
 		for (const Plane& plane : m_PlaneGeometries)
 		{
-			HitRecord tempHit;
 			if (GeometryUtils::HitTest_Plane(plane, ray, tempHit))
 			{
 				if (tempHit.t < closestHit.t)
