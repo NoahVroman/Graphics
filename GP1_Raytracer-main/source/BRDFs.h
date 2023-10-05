@@ -13,16 +13,12 @@ namespace dae
 		 */
 		static ColorRGB Lambert(float kd, const ColorRGB& cd)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			return cd * kd / static_cast<float>(M_PI);
 		}
 
 		static ColorRGB Lambert(const ColorRGB& kd, const ColorRGB& cd)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			return cd * kd / static_cast<float>(M_PI);
 		}
 
 		/**
