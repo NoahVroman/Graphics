@@ -47,7 +47,7 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection.Normalize();
 
 			rayDirection = camera.cameraToWorld.TransformVector(rayDirection);
-
+			rayDirection.Normalize();
 
 			Ray viewRay{camera.origin,rayDirection };
 			ColorRGB finalColor{ };
@@ -62,13 +62,9 @@ void Renderer::Render(Scene* pScene) const
 
 				for (auto& light : lights)
 				{
-					auto dot = Vector3::Dot(closestHit.normal, LightUtils::GetDirectionToLight(light, closestHit.origin).Normalized());
-					if (dot >= 0)
-					{
-						finalColor += LightUtils::GetRadiance(light,closestHit.origin)* materials[closestHit.materialIndex]->Shade() * dot;
-
-					}
-					/*Vector3 lightDirection = light.origin - closestHit.origin;
+					Vector3 LightRayDirection= LightUtils::GetDirectionToLight(light, closestHit.origin);
+					LightRayDirection.Normalize();
+					Vector3 lightDirection = light.origin - closestHit.origin;
 					Vector3 lightRayOrigin = closestHit.origin + closestHit.normal * 0.0000001f;
 
 					Ray lightRay{ lightRayOrigin,lightDirection.Normalized()};
@@ -76,8 +72,17 @@ void Renderer::Render(Scene* pScene) const
 
 					if (pScene->DoesHit(lightRay))
 					{
-						finalColor *= 0.5f;
-					}*/
+						//finalColor *= 0.8f;
+						continue;
+					}
+					//Lambert cosine law
+					auto dot = Vector3::Dot(closestHit.normal, LightRayDirection);
+					if (dot >= 0)
+					{
+						finalColor += LightUtils::GetRadiance(light, closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit,LightRayDirection,rayDirection) * dot;
+
+					}
+
 				}
 
 			}

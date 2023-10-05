@@ -32,9 +32,12 @@ namespace dae
 		 */
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			auto reflect = Vector3::Reflect(n, l);
+			auto cosA = Vector3::Dot(reflect, v);
+
+			auto resultPhong = ks * std::pow(cosA, exp);
+
+			return { resultPhong,resultPhong,resultPhong };
 		}
 
 		/**

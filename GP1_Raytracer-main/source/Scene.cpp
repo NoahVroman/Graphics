@@ -201,7 +201,7 @@ namespace dae {
 		m_Camera.fovAngle = 45.f;
 		m_Camera.SetFOV(45.f);
 		//default: Material id0 >> SolidColor Material (RED)
-		const unsigned char matId_Lambert_Red = AddMaterial(new Material_Lambert{ colors::Red ,1.0f});
+		const unsigned char matId_Lambert_Red = AddMaterial(new Material_LambertPhong{ colors::Red ,1.0f,1.0f,60.0f});
 		const unsigned char matId_Lambert_Blue= AddMaterial(new Material_Lambert{ colors::Blue ,1.0f});
 		const unsigned char matId_Lambert_Yellow = AddMaterial(new Material_Lambert{ colors::Yellow,1.0f });
 
@@ -214,6 +214,7 @@ namespace dae {
 
 		//Light
 		AddPointLight({ 0.f, 5.f, 5.f }, 25.f, colors::White);
+		AddPointLight({ 0.f, 2.5f, -5.f }, 25.f, colors::White);
 
 	}
 #pragma endregion
