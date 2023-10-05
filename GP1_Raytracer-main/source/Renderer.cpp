@@ -55,7 +55,6 @@ void Renderer::Render(Scene* pScene) const
 
 			pScene->GetClosestHit(viewRay, closestHit);
 
-			pScene->GetClosestHit(viewRay, closestHit);
 
 			if (closestHit.didHit)
 			{
@@ -64,7 +63,7 @@ void Renderer::Render(Scene* pScene) const
 				for (auto& light : lights)
 				{
 					Vector3 lightDirection = light.origin - closestHit.origin;
-					Vector3 lightRayOrigin = closestHit.origin + closestHit.normal * 0.00001f;
+					Vector3 lightRayOrigin = closestHit.origin + closestHit.normal * 0.0000001f;
 
 					Ray lightRay{ lightRayOrigin,lightDirection.Normalized()};
 					lightRay.max = lightDirection.Magnitude();

@@ -27,25 +27,24 @@ namespace dae
 				hitRecord.didHit = false;
 				return false;
 			}
-			else if (D > 0) //Hit 2 times
-			{
-				float t = ((-B - sqrtf(D)) / (2 * A));
+			
+			float t = ((-B - sqrtf(D)) / (2 * A));
 
-				if (t < ray.min)
-				{
-					t = ((-B + sqrtf(D)) / (2 * A));
-				}
-				if (t > ray.min && t < ray.max)
-				{
-					hitRecord.didHit = true;
-					hitRecord.origin = ray.origin + ray.direction * t;
-					hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
-					hitRecord.materialIndex = sphere.materialIndex;
-					hitRecord.t = t;
-					return true;
-				}
-				hitRecord.didHit = false;
+			if (t < ray.min)
+			{
+				t = ((-B + sqrtf(D)) / (2 * A));
 			}
+			if (t > ray.min && t < ray.max)
+			{
+				hitRecord.didHit = true;
+				hitRecord.origin = ray.origin + ray.direction * t;
+				hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.t = t;
+				return true;
+			}
+			return false;
+			hitRecord.didHit = false;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
