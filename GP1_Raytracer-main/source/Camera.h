@@ -76,15 +76,17 @@ namespace dae
 			Vector3 localForward = cameraToWorld.TransformVector(forward);
 			localForward.Normalize();
 
-			Vector3 localRight = Vector3::Cross(up, localForward);
 
-			origin += localForward * zDirection;
-			origin += localRight * xDirection;
+			Vector3 localRight = Vector3::Cross(up, localForward);
+			localRight.Normalize();
+
+			origin += speed * localForward * zDirection * deltaTime;
+			origin += speed * localRight * xDirection* deltaTime;
 
 			if (SDL_BUTTON(mouseState) == SDL_BUTTON_LEFT)
 			{
-				totalPitch += mouseY * rotationSpeed * pTimer->GetElapsed();				
-				totalYaw += mouseX * rotationSpeed * pTimer->GetElapsed();
+				totalPitch += mouseY * rotationSpeed * deltaTime;				
+				totalYaw += mouseX * rotationSpeed * deltaTime;
 
 			}
 			if (xDirection != 0 || zDirection != 0 || (SDL_BUTTON(mouseState) == SDL_BUTTON_LEFT && (mouseX != 0.f || mouseY != 0.0f)))

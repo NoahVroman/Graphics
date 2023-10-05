@@ -58,11 +58,17 @@ void Renderer::Render(Scene* pScene) const
 
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
+				
 
 				for (auto& light : lights)
 				{
-					Vector3 lightDirection = light.origin - closestHit.origin;
+					auto dot = Vector3::Dot(closestHit.normal, LightUtils::GetDirectionToLight(light, closestHit.origin).Normalized());
+					if (dot >= 0)
+					{
+						finalColor += LightUtils::GetRadiance(light,closestHit.origin) * dot;
+
+					}
+					/*Vector3 lightDirection = light.origin - closestHit.origin;
 					Vector3 lightRayOrigin = closestHit.origin + closestHit.normal * 0.0000001f;
 
 					Ray lightRay{ lightRayOrigin,lightDirection.Normalized()};
@@ -71,7 +77,7 @@ void Renderer::Render(Scene* pScene) const
 					if (pScene->DoesHit(lightRay))
 					{
 						finalColor *= 0.5f;
-					}
+					}*/
 				}
 
 			}
