@@ -55,7 +55,7 @@ void Renderer::Render(Scene* pScene) const
 
 			pScene->GetClosestHit(viewRay, closestHit);
 
-
+			rayDirection = -rayDirection;
 			if (closestHit.didHit)
 			{
 				
@@ -70,17 +70,17 @@ void Renderer::Render(Scene* pScene) const
 					Ray lightRay{ lightRayOrigin,lightDirection.Normalized()};
 					lightRay.max = lightDirection.Magnitude();
 
-					if (pScene->DoesHit(lightRay))
+					if (m_ShadowEnabled && pScene->DoesHit(lightRay))
 					{
 						//finalColor *= 0.8f;
 						continue;
 					}
 					//Lambert cosine law
+
 					auto dot = Vector3::Dot(closestHit.normal, LightRayDirection);
 					if (dot >= 0)
 					{
 						finalColor += LightUtils::GetRadiance(light, closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit,LightRayDirection,rayDirection) * dot;
-
 					}
 
 				}
@@ -105,4 +105,9 @@ void Renderer::Render(Scene* pScene) const
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
+}
+
+void dae::Renderer::ToggleShadows()
+{
+	m_ShadowEnabled = !m_ShadowEnabled;
 }

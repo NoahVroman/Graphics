@@ -23,11 +23,16 @@ namespace dae
 		void Render(Scene* pScene) const;
 		bool SaveBufferToImage() const;
 
+		void ToggleShadows();
+
+
 	private:
 		SDL_Window* m_pWindow{};
 
 		SDL_Surface* m_pBuffer{};
 		uint32_t* m_pBufferPixels{};
+
+		bool m_ShadowEnabled{ true };
 
 		int m_Width{};
 		int m_Height{};
