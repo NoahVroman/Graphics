@@ -49,9 +49,13 @@ namespace dae
 		 */
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			auto cosTheta = Vector3::Dot(v, h);
+
+			auto diffrenceBetweenWhite = (ColorRGB{ 1.0f,1.0f,1.0f } - f0);
+
+			auto resultFresnel = f0 + diffrenceBetweenWhite * std::pow(1.0f - cosTheta, 5.0f);
+
+			return resultFresnel ;
 		}
 
 		/**
@@ -63,9 +67,15 @@ namespace dae
 		 */
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			auto cosTheta = Vector3::Dot(n, h);
+
+			auto roughnessSquared = roughness * roughness;
+
+			auto distribution = (roughnessSquared + cosTheta * cosTheta - 1.0f) * (roughnessSquared + cosTheta * cosTheta - 1.0f);
+
+			auto result = roughnessSquared / (static_cast<float>(M_PI) * cosTheta * cosTheta * distribution);
+
+			return result;
 		}
 
 
@@ -78,9 +88,13 @@ namespace dae
 		 */
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			auto normalDotVector = std::max(Vector3::Dot(n, v), 0.0f);
+			auto roughnessSquared = roughness * roughness;
+
+			auto distribution = normalDotVector * (1.0f - roughnessSquared) + roughnessSquared;
+			auto result = (2.0f * normalDotVector) / distribution;
+
+			return std::min(result, 1.0f);
 		}
 
 		/**
@@ -93,9 +107,8 @@ namespace dae
 		 */
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+
+			return GeometryFunction_SchlickGGX(n,v,roughness)*GeometryFunction_SchlickGGX(n,l,roughness);
 		}
 
 	}
