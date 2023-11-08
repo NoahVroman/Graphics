@@ -25,10 +25,10 @@ namespace dae
 		float halfFovTan{ 0.0f };
 
 
-		void SetFOV(float newfov) 
-		{
-			fovAngle = newfov;
-			halfFovTan = tanf(fovAngle * 0.5f);
+	void SetFOV(float newfov) 
+	{
+		fovAngle = newfov;
+		halfFovTan = tanf(TO_RADIANS * fovAngle * 0.5f);
 
 		}
 

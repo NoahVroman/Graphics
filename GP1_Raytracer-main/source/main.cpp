@@ -45,7 +45,7 @@ int main(int argc, char* args[])
 	const auto pTimer = new Timer();
 	const auto pRenderer = new Renderer(pWindow);
 
-	const auto pScene = new Scene_W3();
+	const auto pScene = new Scene_W4_Reference();
 	pScene->Initialize();
 
 	//Start loop
@@ -73,6 +73,9 @@ int main(int argc, char* args[])
 					takeScreenshot = true;
 				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
 					pRenderer->ToggleShadows();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
+					pRenderer->ToggleLightMode();
+
 				break;
 			}
 		}

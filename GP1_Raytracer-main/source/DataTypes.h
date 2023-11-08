@@ -34,7 +34,7 @@ namespace dae
 	{
 		Triangle() = default;
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal):
-			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal.Normalized()}{}
+			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal}{}
 
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2) :
 			v0{ _v0 }, v1{ _v1 }, v2{ _v2 }
@@ -84,6 +84,13 @@ namespace dae
 		Matrix translationTransform{};
 		Matrix scaleTransform{};
 
+
+		Vector3 minAABB;
+		Vector3 maxAABB;
+
+		Vector3 transformedMinAABB;
+		Vector3 transformedMaxAABB;
+
 		std::vector<Vector3> transformedPositions{};
 		std::vector<Vector3> transformedNormals{};
 
@@ -123,20 +130,98 @@ namespace dae
 
 		void CalculateNormals()
 		{
-			assert(false && "No Implemented Yet!");
+			normals.clear();
+			for (size_t i = 0; i < indices.size(); i+=3)
+			{
+				Vector3 edge1 = positions[indices[i + 1]] - positions[indices[i]];
+				Vector3 edge2 = positions[indices[i + 2]] - positions[indices[i]];
+
+				Vector3 normal = Vector3::Cross(edge1, edge2);
+
+				normals.push_back(normal.Normalized());
+
+			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
-			//Calculate Final Transform 
-			//const auto finalTransform = ...
+			
+			transformedNormals.clear();
+			transformedPositions.clear();
+			
+			const Matrix finalTransform = scaleTransform * rotationTransform * translationTransform;
 
-			//Transform Positions (positions > transformedPositions)
-			//...
+			transformedNormals.reserve(normals.size());
+			transformedPositions.reserve(positions.size());
+			
+			for (auto& pos : positions)
+			{
+				transformedPositions.emplace_back(finalTransform.TransformPoint(pos));
+			}
 
-			//Transform Normals (normals > transformedNormals)
-			//...
+			for (auto& normals : normals)
+			{
+				 
+				transformedNormals.push_back(finalTransform.TransformVector(normals).Normalized());
+			}
+			UpdateTransformedAABB(finalTransform);
+
+		}
+
+		void UpdateAABB()
+		{
+			if (positions.size() > 0)
+			{
+				minAABB = positions[0];
+				maxAABB = positions[0];
+
+				for (auto& p : positions)
+				{
+					maxAABB = Vector3::Min(p, maxAABB);
+					minAABB = Vector3::Max(p, minAABB);
+				}
+			}
+		
+		}
+
+		void UpdateTransformedAABB(const Matrix& finalTransform)
+		{
+			// AABB update: be careful -> transform the 8 vertices of the aabb
+				// and calculate new min and max.
+			Vector3 tMinAABB = finalTransform.TransformPoint(minAABB);
+			Vector3 tMaxAABB = tMinAABB;
+			// (xmax, ymin, zmin)
+			Vector3 tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			// (xmax, ymin, zmax)
+			tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			// (xmin, ymin, zmax)
+			tAABB = finalTransform.TransformPoint(minAABB.x, minAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			// (xmin, ymax, zmin)
+			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			// (xmax, ymax, zmin)
+			tAABB = finalTransform.TransformPoint(maxAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			// (xmax, ymax, zmax)
+			tAABB = finalTransform.TransformPoint(maxAABB);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+			// (xmin, ymax, zmax)
+			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			transformedMinAABB = tMinAABB;
+			transformedMaxAABB = tMaxAABB;
+		
 		}
 	};
 #pragma endregion
