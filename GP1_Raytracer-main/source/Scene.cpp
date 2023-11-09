@@ -28,24 +28,21 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		HitRecord tempHit;
-		for (const Sphere& sphere : m_SphereGeometries)
-		{
-			if (GeometryUtils::HitTest_Sphere(sphere, ray, tempHit))
-			{
-				closestHit = tempHit;
-			}
 		
-		}
-		for (const Plane& plane : m_PlaneGeometries)
+		for (const auto& plane : m_PlaneGeometries)
 		{
 			GeometryUtils::HitTest_Plane(plane, ray, closestHit);
+		}
+		for (const auto& sphere : m_SphereGeometries)
+		{
+			GeometryUtils::HitTest_Sphere(sphere, ray, closestHit);
+		
 		}
 		for (const auto& triangles : m_Triangles)
 		{
 			GeometryUtils::HitTest_Triangle(triangles, ray, closestHit);
 		}
-		for (auto& triangleMeshes : m_TriangleMeshGeometries)
+		for (const auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
 			GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray, closestHit);
 		}
@@ -53,14 +50,7 @@ namespace dae {
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
-		for (auto& spheres : m_SphereGeometries)
-		{
-			if (GeometryUtils::HitTest_Sphere(spheres,ray))
-			{
-				return true;
-			}
-		}
-		for (auto& planes : m_PlaneGeometries)
+		for (const auto& planes : m_PlaneGeometries)
 		{
 			if (GeometryUtils::HitTest_Plane(planes, ray))
 			{
@@ -68,16 +58,16 @@ namespace dae {
 			}
 
 		}
-
-		for (const auto& triangles : m_Triangles)
+		for (const auto& spheres : m_SphereGeometries)
 		{
-			if (GeometryUtils::HitTest_Triangle(triangles, ray))
+			if (GeometryUtils::HitTest_Sphere(spheres,ray))
 			{
 				return true;
 			}
 		}
 
-		for (auto& triangleMeshes : m_TriangleMeshGeometries)
+
+		for (const auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
 			if (GeometryUtils::HitTest_TriangleMesh(triangleMeshes,ray))
 			{
@@ -156,7 +146,7 @@ namespace dae {
 #pragma region SCENE W1
 	void Scene_W1::Initialize()
 	{
-				//default: Material id0 >> SolidColor Material (RED)
+				
 		constexpr unsigned char matId_Solid_Red = 0;
 		const unsigned char matId_Solid_Blue = AddMaterial(new Material_SolidColor{ colors::Blue });
 
@@ -249,7 +239,7 @@ namespace dae {
 #pragma endregion
 	void Scene_W4_Bunny::Initialize()
 	{
-		m_Camera.origin = { 0.f,1.f,-5.f };
+		m_Camera.origin = { 0,3,-9 };
 		m_Camera.SetFOV(45.f);
 
 		const auto matLambert_GrayBlue = AddMaterial(new Material_Lambert({ .49f, 0.57f, 0.57f }, 1.f));
@@ -282,7 +272,10 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 
+		const auto yawAngle = (cosf(pTimer->GetTotal()) + 1.f) / 2.f * PI_2;
+		pMesh->RotateY(yawAngle);
 		pMesh->UpdateTransforms();
+
 	}
 
 	void Scene_W4_Triangle::Initialize()
@@ -326,8 +319,6 @@ namespace dae {
 	void Scene_W4_Triangle::Update(Timer* pTimer)
 	{
 		Scene::Update(pTimer);
-
-
 	}
 
 

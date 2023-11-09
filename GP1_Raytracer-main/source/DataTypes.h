@@ -36,6 +36,9 @@ namespace dae
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal):
 			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal}{}
 
+		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal, const TriangleCullMode _cullmode, const unsigned char _materialIndex) :
+			v0{ _v0 }, v1{ _v1 }, v2{ _v2 }, normal{ _normal }, cullMode{ _cullmode }, materialIndex{ _materialIndex } {}
+
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2) :
 			v0{ _v0 }, v1{ _v1 }, v2{ _v2 }
 		{
@@ -113,15 +116,15 @@ namespace dae
 		{
 			int startIndex = static_cast<int>(positions.size());
 
-			positions.push_back(triangle.v0);
-			positions.push_back(triangle.v1);
-			positions.push_back(triangle.v2);
+			positions.emplace_back(triangle.v0);
+			positions.emplace_back(triangle.v1);
+			positions.emplace_back(triangle.v2);
 
-			indices.push_back(startIndex);
-			indices.push_back(++startIndex);
-			indices.push_back(++startIndex);
+			indices.emplace_back(startIndex);
+			indices.emplace_back(++startIndex);
+			indices.emplace_back(++startIndex);
 
-			normals.push_back(triangle.normal);
+			normals.emplace_back(triangle.normal);
 
 			//Not ideal, but making sure all vertices are updated
 			if(!ignoreTransformUpdate)
@@ -131,15 +134,10 @@ namespace dae
 		void CalculateNormals()
 		{
 			normals.clear();
+			normals.reserve(indices.size());
 			for (size_t i = 0; i < indices.size(); i+=3)
 			{
-				Vector3 edge1 = positions[indices[i + 1]] - positions[indices[i]];
-				Vector3 edge2 = positions[indices[i + 2]] - positions[indices[i]];
-
-				Vector3 normal = Vector3::Cross(edge1, edge2);
-
-				normals.push_back(normal.Normalized());
-
+				normals.emplace_back(Vector3::Cross(positions[indices[i + 1]] - positions[indices[i]], positions[indices[i + 2]] - positions[indices[i]]).Normalized());
 			}
 		}
 
@@ -162,7 +160,7 @@ namespace dae
 			for (auto& normals : normals)
 			{
 				 
-				transformedNormals.push_back(finalTransform.TransformVector(normals).Normalized());
+				transformedNormals.emplace_back(finalTransform.TransformVector(normals).Normalized());
 			}
 			UpdateTransformedAABB(finalTransform);
 

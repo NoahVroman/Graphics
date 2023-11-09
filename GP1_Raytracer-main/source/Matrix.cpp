@@ -104,34 +104,39 @@ namespace dae {
 
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
-		//todo W2
-		return { CreateTranslation({x,y,z}) };
+		return		
+		{
+			{1,0,0,0},
+			{0,1,0,0},
+			{0,0,1,0},
+			{x,y,z,1},
+		};
+		;
 		
 	}
 
 	Matrix Matrix::CreateTranslation(const Vector3& t)
 	{
-		return { Vector3::UnitX, Vector3::UnitY, Vector3::UnitZ, t };
+		return { CreateTranslation(t[0],t[1],t[2])};
 	}
 
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
-		float c = cosf(pitch);
-		float s = sinf(pitch);
+		const float c{ cosf(pitch) };
+		const float s{ sinf(pitch) };
 		return
 		{
 			{1,0,0,0 },
 			{0,c,s,0 },
 			{0,-s,c,0},
 			{0,0,0, 1},
-
 		};
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
-		float c = cosf(yaw);
-		float s = sinf(yaw);
+		const float c { cosf(yaw)};
+		const float s { sinf(yaw)};
 
 		return
 		{
@@ -145,9 +150,8 @@ namespace dae {
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
-		float c = cosf(roll);
-		float s = sinf(roll);
-
+		const float c{ cosf(roll) };
+		const float s{ sinf(roll) };
 		return
 		{
 			{c,s,0,0},
@@ -160,8 +164,6 @@ namespace dae {
 
 	Matrix Matrix::CreateRotation(const Vector3& r)
 	{
-		//todo W2
-			
 		return {CreateRotationX(r.x)*CreateRotationY(r.y)*CreateRotationZ(r.z)};
 	}
 
@@ -172,7 +174,6 @@ namespace dae {
 
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
-		//todo W2
 
 		return 
 		{

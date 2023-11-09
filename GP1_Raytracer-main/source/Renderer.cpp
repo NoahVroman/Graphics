@@ -1,4 +1,5 @@
 //External includes
+#include <execution>
 #include "SDL.h"
 #include "SDL_surface.h"
 
@@ -9,7 +10,6 @@
 #include "Material.h"
 #include "Scene.h"
 #include "Utils.h"
-#include <execution>
 
 #define PARALLEL_EXECUTION
 
@@ -19,9 +19,17 @@ Renderer::Renderer(SDL_Window * pWindow) :
 	m_pWindow(pWindow),
 	m_pBuffer(SDL_GetWindowSurface(pWindow))
 {
+
+	
+
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 	m_pBufferPixels = static_cast<uint32_t*>(m_pBuffer->pixels);
+
+	m_NrPixels = m_Width * m_Height;
+
+	m_PixelIndeces.reserve(m_NrPixels);
+	for (size_t index{}; index < m_NrPixels; ++index) m_PixelIndeces.emplace_back(index);
 }
 
 void Renderer::Render(Scene* pScene) const
@@ -40,18 +48,10 @@ void Renderer::Render(Scene* pScene) const
 	
 #ifdef PARALLEL_EXECUTION
 
-	uint32_t amountOfPixels{ uint32_t(m_Width * m_Height) };
-	std::vector<uint32_t> pixelIndices{};
 
-	pixelIndices.reserve(amountOfPixels);
-	for (size_t index{}; index < amountOfPixels; ++index) pixelIndices.emplace_back(index);
-
-	std::for_each(std::execution::par, pixelIndices.begin(), pixelIndices.end(), [&](int i) {
-		RenderPixel(pScene, i, fov, aspectRatio, cameraToWorld, camera.origin);
+	std::for_each(std::execution::par, m_PixelIndeces.begin(), m_PixelIndeces.end(), [&](int i) {
+		RenderPixel(pScene, i, fov, aspectRatio, cameraToWorld, camera.origin,materials,lights);
 	});
-
-
-
 
 
 #else
@@ -133,10 +133,8 @@ void Renderer::Render(Scene* pScene) const
 	SDL_UpdateWindowSurface(m_pWindow);
 }
 
-void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 cameraOrigin) const
+void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 cameraOrigin,const std::vector<dae::Material*>& materials, const std::vector<dae::Light>& lights) const
 {
-	auto& lights = pScene->GetLights();
-	auto& materials{ pScene->GetMaterials() };
 
 	const uint32_t px{ pixelIndex % m_Width }, py{ pixelIndex / m_Width };
 
@@ -161,6 +159,7 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 	pScene->GetClosestHit(viewRay, closestHit);
 
 	rayDirection = -rayDirection;
+
 	if (closestHit.didHit)
 	{
 
@@ -168,12 +167,15 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 		{
 			Vector3 LightRayDirection = LightUtils::GetDirectionToLight(lights[index], closestHit.origin);
 		    viewRay.max = LightRayDirection.Normalize();
-			viewRay.origin = closestHit.origin + closestHit.normal * 0.0000001f;
+			viewRay.origin = closestHit.origin + closestHit.normal * 0.01f;
 			viewRay.direction = LightRayDirection;
 
-			if (m_ShadowEnabled && pScene->DoesHit(viewRay))
+			if (m_ShadowEnabled)
 			{
+				if (pScene->DoesHit(viewRay))
+				{
 					continue;
+				}
 			}
 
 			switch (m_LightMode)
@@ -215,7 +217,6 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 				finalColor += LightUtils::GetRadiance(lights[index], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, LightRayDirection, rayDirection) * dot;
 
 			}
-			
 				break;
 			}
 

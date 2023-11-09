@@ -46,13 +46,14 @@ int main(int argc, char* args[])
 	const auto pRenderer = new Renderer(pWindow);
 
 	const auto pScene = new Scene_W4_Reference();
+	//const auto pScene = new Scene_W4_Bunny();
+
 	pScene->Initialize();
 
 	//Start loop
 	pTimer->Start();
 
 	// Start Benchmark
-	// pTimer->StartBenchmark();
 
 	float printTimer = 0.f;
 	bool isLooping = true;
@@ -75,6 +76,8 @@ int main(int argc, char* args[])
 					pRenderer->ToggleShadows();
 				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
 					pRenderer->ToggleLightMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pTimer->StartBenchmark();
 
 				break;
 			}

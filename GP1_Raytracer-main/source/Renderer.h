@@ -1,15 +1,19 @@
 #pragma once
 
 #include <cstdint>
-#include "Math.h"
+#include <vector>
 struct SDL_Window;
 struct SDL_Surface;
-struct Vector3;
 
 
 namespace dae
 {
 	class Scene;
+	class Material;
+	
+	struct Matrix;
+	struct Vector3;
+	struct Light;
 
 	class Renderer final
 	{
@@ -25,7 +29,7 @@ namespace dae
 
 		void Render(Scene* pScene) const;
 
-		void RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 cameraOrigin)const;
+		void RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float aspectRatio, const Matrix cameraToWorld, const Vector3 cameraOrigin, const std::vector<dae::Material*>& materials, const std::vector<dae::Light>& lights)const;
 
 		bool SaveBufferToImage() const;
 
@@ -54,5 +58,8 @@ namespace dae
 
 		int m_Width{};
 		int m_Height{};
+
+		std::vector<uint32_t> m_PixelIndeces{};
+		uint32_t m_NrPixels{};
 	};
 }
